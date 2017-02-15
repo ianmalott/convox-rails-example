@@ -1,5 +1,9 @@
 version: "2"
 services:
+  redis:
+    image: convox/redis
+    ports:
+      - 6379
   web:
     build: .
     labels:
@@ -8,3 +12,8 @@ services:
     ports:
       - 80:4000
       - 443:4001
+  worker:
+    build: .
+    command: bundle exec sidekiq
+    links:
+      - redis
