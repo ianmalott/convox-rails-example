@@ -1,0 +1,58 @@
+version: "2"
+services:
+  console:
+    build:
+      context: .
+    command: bin/rails console
+    environment:
+    - SECRET_KEY_BASE=8e921e60c3edd2a7d513235eee5b4797dbe1555dad298964233399dd1d5e713e1f5ce0bbced0b53b2b234da687bdc4d0bb1f651dababb8747b7c037b231ed4bb
+    - RAILS_SERVE_STATIC_FILES=enabled
+    - RAILS_LOG_TO_STDOUT=enabled
+    - LANG=en_US.UTF-8
+    - RAILS_ENV=production
+    - RACK_ENV=production
+  database:
+    image: convox/postgres
+    ports:
+    - 5432/tcp
+    volumes:
+    - /var/lib/postgresql/data
+  rake:
+    build:
+      context: .
+    command: bundle exec rake
+    environment:
+    - SECRET_KEY_BASE=8e921e60c3edd2a7d513235eee5b4797dbe1555dad298964233399dd1d5e713e1f5ce0bbced0b53b2b234da687bdc4d0bb1f651dababb8747b7c037b231ed4bb
+    - RAILS_SERVE_STATIC_FILES=enabled
+    - RAILS_LOG_TO_STDOUT=enabled
+    - LANG=en_US.UTF-8
+    - RAILS_ENV=production
+    - RACK_ENV=production
+  web:
+    build:
+      context: .
+    command: bin/rails server -p $PORT -e $RAILS_ENV
+    environment:
+    - PORT=4001
+    - SECRET_KEY_BASE=8e921e60c3edd2a7d513235eee5b4797dbe1555dad298964233399dd1d5e713e1f5ce0bbced0b53b2b234da687bdc4d0bb1f651dababb8747b7c037b231ed4bb
+    - RAILS_SERVE_STATIC_FILES=enabled
+    - RAILS_LOG_TO_STDOUT=enabled
+    - LANG=en_US.UTF-8
+    - RAILS_ENV=production
+    - RACK_ENV=production
+    links:
+    - database
+    ports:
+    - 80:4001/tcp
+    - 443:4001/tcp
+  worker:
+    build:
+      context: .
+    command: bundle exec rake jobs:work
+    environment:
+    - SECRET_KEY_BASE=8e921e60c3edd2a7d513235eee5b4797dbe1555dad298964233399dd1d5e713e1f5ce0bbced0b53b2b234da687bdc4d0bb1f651dababb8747b7c037b231ed4bb
+    - RAILS_SERVE_STATIC_FILES=enabled
+    - RAILS_LOG_TO_STDOUT=enabled
+    - LANG=en_US.UTF-8
+    - RAILS_ENV=production
+    - RACK_ENV=production
